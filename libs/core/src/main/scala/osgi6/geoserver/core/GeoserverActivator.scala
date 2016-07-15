@@ -1,5 +1,6 @@
 package osgi6.geoserver.core
 
+import java.io.File
 import java.util
 import javax.naming.InitialContext
 import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper, HttpServletResponse}
@@ -12,6 +13,7 @@ import org.osgi.framework.BundleContext
 import org.springframework.web.servlet.DispatcherServlet
 import osgi6.actor.ActorSystemActivator
 import osgi6.common.AsyncActivator
+import osgi6.geoserver.core.GeoserverBuilder.Input
 import osgi6.lib.multi.{ContextApiActivator, MultiApiActivator}
 import osgi6.multi.api.MultiApi.{Callback, Handler}
 import osgi6.multi.api.{Context, MultiApi}
@@ -47,6 +49,16 @@ object GeoserverActivator {
     )
   }
 
+  def createWac(
+    workDir: File
+  ) = {
+    GeoserverBuilder.input = Input(
+      workDir
+    )
+
+    GeoserverBuilder.instance
+  }
+
   def createHandler(
     rootPath : String,
     apiCtx : Context,
@@ -56,24 +68,20 @@ object GeoserverActivator {
     val workDir = IO.createTemporaryDirectory
 
     val servlet = {
-      val dataStoreMap : Map[String, DataStore] = Map(
-      )
 
-      def createWac() = GeoserverStarter.setupGeoserver(workDir,
-        dataStoreMap
-      )
+      def doCreateWac() = createWac(workDir)
 
-      val wac =
+      val (gs, ws) =
         classLoader.map({ cl =>
           val clx = Thread.currentThread().getContextClassLoader
           Thread.currentThread().setContextClassLoader(cl)
           try {
-            createWac()
+            doCreateWac()
           } finally {
             Thread.currentThread().setContextClassLoader(clx)
           }
         }).getOrElse(
-          createWac()
+          doCreateWac()
         )
 
       val config = new ServletConfig {
@@ -84,7 +92,7 @@ object GeoserverActivator {
         override def getServletContext: ServletContext = apiCtx.servletConfig.getServletContext
       }
 
-      val s = new DispatcherServlet(wac)
+      val s = new DispatcherServlet(gs.webApplicationContext)
       s.init(config)
       s
     }

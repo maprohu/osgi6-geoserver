@@ -82,6 +82,11 @@
             <groupId>osgi6</groupId>
             <artifactId>osgi6-lib-multi</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.github.davidmoten</groupId>
+            <artifactId>rtree</artifactId>
+            <version>0.7.5</version>
+        </dependency>
 
     </dependencies>
 
