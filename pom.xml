@@ -122,6 +122,11 @@
                     </archive>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.10</version>
+            </plugin>
         </plugins>
     </build>
 
@@ -253,6 +258,11 @@
             <dependency>
                 <groupId>osgi6</groupId>
                 <artifactId>osgi6-multi-api</artifactId>
+                <version>${osgi6.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>osgi6</groupId>
+                <artifactId>osgi6-lib-multi</artifactId>
                 <version>${osgi6.version}</version>
             </dependency>
 

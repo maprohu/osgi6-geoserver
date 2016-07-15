@@ -67,16 +67,16 @@ class GeoserverBuilder(workdir: File, dataStoreMap : Map[String, DataStore]) {
 
   new GeoServerExtensions().setApplicationContext(ctx)
 
-  val watermark = new WatermarkInfoImpl
-  watermark.setEnabled(true)
-  watermark.setURL(getClass.getResource("/emsa.png").toExternalForm)
-  watermark.setTransparency(64)
+//  val watermark = new WatermarkInfoImpl
+//  watermark.setEnabled(true)
+//  watermark.setURL(getClass.getResource("/emsa.png").toExternalForm)
+//  watermark.setTransparency(64)
 
   val geoserver = new GeoServerImpl
   val wmsInfo = new WMSInfoImpl()
-  wmsInfo.setTitle("EMSA Public WMS")
-  wmsInfo.setAbstract("EMSA Public WMS")
-  wmsInfo.setWatermark(watermark)
+//  wmsInfo.setTitle("EMSA Public WMS")
+//  wmsInfo.setAbstract("EMSA Public WMS")
+//  wmsInfo.setWatermark(watermark)
   geoserver.add(wmsInfo)
 
 

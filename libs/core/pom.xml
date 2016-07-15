@@ -56,6 +56,12 @@
             <groupId>org.geoserver</groupId>
             <artifactId>gs-wms</artifactId>
             <version>${gs.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!--<dependency>-->
             <!--<groupId>com.twitter</groupId>-->
@@ -71,6 +77,10 @@
         <dependency>
             <groupId>osgi6</groupId>
             <artifactId>osgi6-actor</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>osgi6</groupId>
+            <artifactId>osgi6-lib-multi</artifactId>
         </dependency>
 
     </dependencies>
