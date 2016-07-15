@@ -312,7 +312,7 @@
 
     <scm>
         <developerConnection>scm:git:https://github.com/maprohu/osgi6-geoserver.git</developerConnection>
-      <tag>HEAD</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <modules>

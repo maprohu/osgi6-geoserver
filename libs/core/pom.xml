@@ -53,12 +53,41 @@
             <version>0.4.0</version>
         </dependency>
         <dependency>
+            <groupId>it.geosolutions.imageio-ext</groupId>
+            <artifactId>imageio-ext-png</artifactId>
+            <version>1.1.15</version>
+        </dependency>
+        <dependency>
+            <groupId>it.geosolutions.imageio-ext</groupId>
+            <artifactId>imageio-ext-arcgrid</artifactId>
+            <version>1.1.15</version>
+        </dependency>
+        <dependency>
+            <groupId>it.geosolutions.imageio-ext</groupId>
+            <artifactId>imageio-ext-geocore</artifactId>
+            <version>1.1.15</version>
+        </dependency>
+        <dependency>
+            <groupId>it.geosolutions.imageio-ext</groupId>
+            <artifactId>imageio-ext-streams</artifactId>
+            <version>1.1.15</version>
+        </dependency>
+        <dependency>
+            <groupId>it.geosolutions.imageio-ext</groupId>
+            <artifactId>imageio-ext-tiff</artifactId>
+            <version>1.1.15</version>
+        </dependency>
+        <dependency>
             <groupId>org.geoserver</groupId>
             <artifactId>gs-wms</artifactId>
             <version>${gs.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>xml-apis</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>it.geosolutions.imageio-ext</groupId>
                     <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
