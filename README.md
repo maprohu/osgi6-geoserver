@@ -1,0 +1,1 @@
+# osgi6-geoserver
