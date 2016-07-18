@@ -9,7 +9,6 @@
     </parent>
     <artifactId>osgi6-geoserver-h2</artifactId>
     <packaging>jar</packaging>
-    <name>H2GIS-GS</name>
     <description>H2GIS-GS is an extension to connect the spatial extension of the H2 database engine, H2GIS to geoserver.</description>
     <organization>
         <name>Lab-STICC CNRS UMR 6285</name>
