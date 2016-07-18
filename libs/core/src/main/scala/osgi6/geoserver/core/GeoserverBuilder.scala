@@ -594,19 +594,14 @@ object GeoserverBuilder {
       </NamedLayer>
     </StyledLayerDescriptor>
 
-
-
-
-
 }
 
 class GS(
-val webApplicationContext: WebApplicationContext,
+  val webApplicationContext: WebApplicationContext,
   val catalog: CatalogImpl,
   val workdir: File,
   val addFactory : GeoserverBuilder.AddFactory
-) {
-}
+)
 
 class WS(
   gs: GS,

@@ -19,3 +19,4 @@ project/plugins/project/
 
 .idea/
 *.iml
+/libs/h2/testH2/
