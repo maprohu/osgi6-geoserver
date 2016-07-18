@@ -8,12 +8,13 @@ import maprohu.scalaext.common.Stateful
 import org.geoserver.catalog.{ProjectionPolicy, StoreInfo}
 import org.geoserver.catalog.impl._
 import org.geoserver.config.impl.GeoServerImpl
+import org.geoserver.ows.kvp.BooleanKvpParser
 import org.geoserver.ows.{Dispatcher, OWSHandlerMapping}
 import org.geoserver.platform.{GeoServerExtensions, GeoServerResourceLoader, Service}
 import org.geoserver.wfs.{WFSInfoImpl, WFSLoader, WFSXStreamLoader}
 import org.geoserver.wfs.kvp.BBoxKvpParser
 import org.geoserver.wms._
-import org.geoserver.wms.capabilities.{CapabilitiesKvpReader, Capabilities_1_3_0_Response}
+import org.geoserver.wms.capabilities.{CapabilitiesKvpReader, Capabilities_1_3_0_Response, GetCapabilitiesResponse}
 import org.geoserver.wms.featureinfo._
 import org.geoserver.wms.legendgraphic.{GetLegendGraphicKvpReader, PNGLegendGraphicResponse, PNGLegendOutputFormat}
 import org.geoserver.wms.map._
@@ -474,7 +475,9 @@ object GeoserverBuilder {
     // 2.8.2
     //        reg(new DimensionDefaultValueSelectionStrategyFactoryImpl)
     reg(new Capabilities_1_3_0_Response)
+    reg(new GetCapabilitiesResponse(wms))
     reg(new BBoxKvpParser)
+    reg(new BooleanKvpParser("transparent"))
     //    reg(new LegendSampleImpl(catalog, gsrl))
     reg(new PNGLegendOutputFormat)
 
@@ -519,7 +522,15 @@ object GeoserverBuilder {
       "GetFeatureInfo",
       "GetLegendGraphic"
     ))
-    reg(wms130sd)
+    regNamed("wms130", wms130sd)
+
+    val wms111sd = new Service("wms", wmsService, new Version("1.1.1"), List(
+      "GetCapabilities",
+      "GetMap",
+      "GetFeatureInfo",
+      "GetLegendGraphic"
+    ))
+    regNamed("wms111", wms111sd)
 
     // 2.8.2
     //        reg(new SLDHandler)
