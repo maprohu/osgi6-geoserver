@@ -171,18 +171,18 @@ public class H2GISDialect extends BasicSQLDialect {
     public void encodeGeometryColumn(GeometryDescriptor gatt, String prefix, int srid, Hints hints,
             StringBuffer sql) {
 
-        boolean force2D = hints != null && hints.containsKey(Hints.FEATURE_2D)
-                && Boolean.TRUE.equals(hints.get(Hints.FEATURE_2D));
-
-        if (force2D) {
-            sql.append("ST_AsBinary(ST_Force2D(");
-            encodeColumnName(prefix, gatt.getLocalName(), sql);
-            sql.append("))");
-        } else {
+//        boolean force2D = hints != null && hints.containsKey(Hints.FEATURE_2D)
+//                && Boolean.TRUE.equals(hints.get(Hints.FEATURE_2D));
+//
+//        if (force2D) {
+//            sql.append("ST_AsBinary(ST_Force2D(");
+//            encodeColumnName(prefix, gatt.getLocalName(), sql);
+//            sql.append("))");
+//        } else {
             sql.append("ST_AsBinary(");
             encodeColumnName(prefix, gatt.getLocalName(), sql);
             sql.append(")");
-        }        
+//        }
     }    
     
 
