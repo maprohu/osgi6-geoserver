@@ -109,7 +109,7 @@ public class H2GISDialect extends BasicSQLDialect {
     
     boolean functionEncodingEnabled = true;    
     
-    boolean simplifyEnabled = true;
+    boolean simplifyEnabled = false;
     
     @Override
     public boolean isAggregatedSortSupported(String function) {

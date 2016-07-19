@@ -324,5 +324,6 @@
 
     <modules>
         <module>libs</module>
+        <!--<module>bundles</module>-->
     </modules>
 </project>
