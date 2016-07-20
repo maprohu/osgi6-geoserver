@@ -500,26 +500,6 @@ class GS(
     )
   }
 
-  def addStyle(
-    name: String,
-    style: Node
-  ) : StyleInfoImpl = {
-
-    val styleFileName = s"${name}.sld"
-    val stylesDir = workdir / "styles"
-    stylesDir.mkdirs()
-    XML.save(
-      (stylesDir / styleFileName).absolutePath,
-      style
-    )
-
-    val styleInfo = new StyleInfoImpl(catalog)
-    styleInfo.setName(s"${name}_style")
-    styleInfo.setFilename(styleFileName)
-    catalog.add(styleInfo)
-
-    styleInfo
-  }
 }
 
 class WS(
@@ -530,13 +510,34 @@ class WS(
   import gs._
 
 
-  def addLayer(
+  def addStyle(
+    name: String,
+    style: Node
+  ) : StyleInfoImpl = {
+
+    val styleFileName = s"${name}.sld"
+    val stylesDir = workdir / "workspaces" / workspaceInfo.getName / "styles"
+    stylesDir.mkdirs()
+    XML.save(
+      (stylesDir / styleFileName).absolutePath,
+      style
+    )
+
+    val styleInfo = new StyleInfoImpl(catalog)
+    styleInfo.setName(s"${name}")
+    styleInfo.setWorkspace(workspaceInfo)
+    styleInfo.setFilename(styleFileName)
+    catalog.add(styleInfo)
+
+    styleInfo
+  }
+
+
+
+  def addStore(
     layerName: String,
-    title: String,
-    dataAccessId: String,
-    styleInfo: StyleInfo,
-    advertised : Boolean = true
-  ) = {
+    dataAccessId: String
+  ): StoreInfoImpl = {
     val storeInfo = new DataStoreInfoImpl(catalog)
     storeInfo.setName(layerName)
     storeInfo.setWorkspace(workspaceInfo)
@@ -547,8 +548,18 @@ class WS(
     ))
     catalog.add(storeInfo)
 
+    storeInfo
+
+  }
+
+  def addResource(
+    storeInfo : StoreInfo,
+    layerName: String,
+    title: String
+  ): ResourceInfoImpl = {
     val resourceInfo = new FeatureTypeInfoImpl(catalog)
     resourceInfo.setName(layerName)
+    resourceInfo.setNativeName(storeInfo.getType)
     resourceInfo.setTitle(title)
     resourceInfo.setStore(storeInfo)
     resourceInfo.setNamespace(namespaceInfo)
@@ -556,14 +567,63 @@ class WS(
     resourceInfo.setProjectionPolicy(ProjectionPolicy.NONE)
     resourceInfo.setSRS("EPSG:4326")
     resourceInfo.setLatLonBoundingBox(new ReferencedEnvelope(-180, 180, -90, 90, DefaultGeographicCRS.WGS84))
-//    resourceInfo.setProjectionPolicy(ProjectionPolicy.REPROJECT_TO_DECLARED)
-//    resourceInfo.setSRS("EPSG:3395")
-//    resourceInfo.setNativeCRS(DefaultGeographicCRS.WGS84)
-//    resourceInfo.setNativeBoundingBox(new ReferencedEnvelope(-180, 180, -85, 85, DefaultGeographicCRS.WGS84))
-//    resourceInfo.setLatLonBoundingBox(resourceInfo.getNativeBoundingBox)//.transform(resourceInfo.getCRS, true))
-//    resourceInfo.setLatLonBoundingBox(new ReferencedEnvelope(-180, 180, -85, 85, DefaultGeographicCRS.WGS84))
+    //    resourceInfo.setProjectionPolicy(ProjectionPolicy.REPROJECT_TO_DECLARED)
+    //    resourceInfo.setSRS("EPSG:3395")
+    //    resourceInfo.setNativeCRS(DefaultGeographicCRS.WGS84)
+    //    resourceInfo.setNativeBoundingBox(new ReferencedEnvelope(-180, 180, -85, 85, DefaultGeographicCRS.WGS84))
+    //    resourceInfo.setLatLonBoundingBox(resourceInfo.getNativeBoundingBox)//.transform(resourceInfo.getCRS, true))
+    //    resourceInfo.setLatLonBoundingBox(new ReferencedEnvelope(-180, 180, -85, 85, DefaultGeographicCRS.WGS84))
     resourceInfo.setNativeBoundingBox(resourceInfo.getLatLonBoundingBox.transform(resourceInfo.getCRS, true))
     catalog.add(resourceInfo)
+
+    resourceInfo
+  }
+
+  def addLayer(
+    layerName: String,
+    title: String,
+    dataAccessId: String,
+    styleInfo: StyleInfo,
+    advertised : Boolean
+  ) : LayerInfoImpl = {
+    val storeInfo = addStore(layerName, dataAccessId)
+
+    val resourceInfo = addResource(storeInfo, layerName, title)
+
+    addLayer(
+      resourceInfo,
+      layerName,
+      title,
+      styleInfo,
+      advertised
+    )
+  }
+
+  def addLayer(
+    storeInfo : StoreInfo,
+    layerName: String,
+    title: String,
+    styleInfo: StyleInfo,
+    advertised : Boolean
+  ) : LayerInfoImpl = {
+    val resourceInfo = addResource(storeInfo, layerName, title)
+
+    addLayer(
+      resourceInfo,
+      layerName,
+      title,
+      styleInfo,
+      advertised
+    )
+  }
+
+  def addLayer(
+    resourceInfo: ResourceInfo,
+    layerName: String,
+    title: String,
+    styleInfo: StyleInfo,
+    advertised : Boolean
+  ) : LayerInfoImpl = {
 
     val layerInfo = new LayerInfoImpl
     layerInfo.setResource(resourceInfo)
@@ -595,8 +655,8 @@ class WS(
     layerGroupInfo.setLayers(new util.ArrayList[PublishedInfo](layers))
     layerGroupInfo.setBounds(bounds)
 
-
-
     catalog.add(layerGroupInfo)
+
+    layerGroupInfo
   }
 }
