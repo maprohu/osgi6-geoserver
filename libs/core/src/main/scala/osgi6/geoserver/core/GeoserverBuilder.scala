@@ -5,7 +5,7 @@ import java.io.{File, Serializable}
 import java.util
 
 import maprohu.scalaext.common.Stateful
-import org.geoserver.catalog.{Catalog, ProjectionPolicy, StoreInfo, StyleInfo}
+import org.geoserver.catalog.{util => _, _}
 import org.geoserver.catalog.impl._
 import org.geoserver.config.impl.GeoServerImpl
 import org.geoserver.ows.kvp.BooleanKvpParser
@@ -532,8 +532,10 @@ class WS(
 
   def addLayer(
     layerName: String,
+    title: String,
     dataAccessId: String,
-    styleInfo: StyleInfo
+    styleInfo: StyleInfo,
+    advertised : Boolean = true
   ) = {
     val storeInfo = new DataStoreInfoImpl(catalog)
     storeInfo.setName(layerName)
@@ -547,6 +549,7 @@ class WS(
 
     val resourceInfo = new FeatureTypeInfoImpl(catalog)
     resourceInfo.setName(layerName)
+    resourceInfo.setTitle(title)
     resourceInfo.setStore(storeInfo)
     resourceInfo.setNamespace(namespaceInfo)
     resourceInfo.setEnabled(true)
@@ -566,6 +569,34 @@ class WS(
     layerInfo.setResource(resourceInfo)
     layerInfo.setName(layerName)
     layerInfo.setDefaultStyle(styleInfo)
+    layerInfo.setTitle(title)
+    layerInfo.setAdvertised(advertised)
     catalog.add(layerInfo)
+
+    layerInfo
+  }
+
+  def addLayerGroup(
+    name: String,
+    layers: LayerInfo*
+  ) = {
+    val bounds =
+      layers
+        .map(_.getResource.boundingBox())
+        .reduce({ (a, b) =>
+          val res = new ReferencedEnvelope(a)
+          res.expandToInclude(b)
+          res
+        })
+
+    val layerGroupInfo = new LayerGroupInfoImpl
+    layerGroupInfo.setWorkspace(workspaceInfo)
+    layerGroupInfo.setName(name)
+    layerGroupInfo.setLayers(new util.ArrayList[PublishedInfo](layers))
+    layerGroupInfo.setBounds(bounds)
+
+
+
+    catalog.add(layerGroupInfo)
   }
 }
