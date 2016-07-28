@@ -556,7 +556,7 @@ class WS(
     storeInfo : StoreInfo,
     layerName: String,
     title: String
-  ): ResourceInfoImpl = {
+  ): Option[ResourceInfoImpl] = {
     val builder = new CatalogBuilder(catalog)
 
     val resourceInfo = new FeatureTypeInfoImpl(catalog)
@@ -570,9 +570,17 @@ class WS(
     resourceInfo.setSRS("EPSG:4326")
     resourceInfo.setNativeCRS(DefaultGeographicCRS.WGS84)
 //    resourceInfo.setLatLonBoundingBox(new ReferencedEnvelope(-180, 180, -90, 90, DefaultGeographicCRS.WGS84))
-
     resourceInfo.setNativeBoundingBox(builder.getNativeBounds(resourceInfo))
     resourceInfo.setLatLonBoundingBox(resourceInfo.getNativeBoundingBox)
+
+
+    if (resourceInfo.getNativeBoundingBox.isEmpty) {
+      None
+    } else {
+      catalog.add(resourceInfo)
+      Some(resourceInfo)
+    }
+
 
     //    resourceInfo.setProjectionPolicy(ProjectionPolicy.REPROJECT_TO_DECLARED)
     //    resourceInfo.setSRS("EPSG:3395")
@@ -582,9 +590,6 @@ class WS(
     //    resourceInfo.setLatLonBoundingBox(new ReferencedEnvelope(-180, 180, -85, 85, DefaultGeographicCRS.WGS84))
 //    resourceInfo.setNativeBoundingBox(resourceInfo.getLatLonBoundingBox.transform(resourceInfo.getCRS, true))
 
-    catalog.add(resourceInfo)
-
-    resourceInfo
   }
 
   def addLayer(
@@ -593,18 +598,21 @@ class WS(
     dataAccessId: String,
     styleInfo: StyleInfo,
     advertised : Boolean
-  ) : LayerInfoImpl = {
+  ) : Option[LayerInfoImpl] = {
     val storeInfo = addStore(layerName, dataAccessId)
 
-    val resourceInfo = addResource(storeInfo, layerName, title)
+    val resourceInfoOpt = addResource(storeInfo, layerName, title)
 
-    addLayer(
-      resourceInfo,
-      layerName,
-      title,
-      styleInfo,
-      advertised
+    resourceInfoOpt.map(resourceInfo =>
+      addLayer(
+        resourceInfo,
+        layerName,
+        title,
+        styleInfo,
+        advertised
+      )
     )
+
   }
 
   def addLayer(
@@ -613,15 +621,17 @@ class WS(
     title: String,
     styleInfo: StyleInfo,
     advertised : Boolean
-  ) : LayerInfoImpl = {
-    val resourceInfo = addResource(storeInfo, layerName, title)
+  ) : Option[LayerInfoImpl] = {
+    val resourceInfoOpt = addResource(storeInfo, layerName, title)
 
-    addLayer(
-      resourceInfo,
-      layerName,
-      title,
-      styleInfo,
-      advertised
+    resourceInfoOpt.map(resourceInfo =>
+      addLayer(
+        resourceInfo,
+        layerName,
+        title,
+        styleInfo,
+        advertised
+      )
     )
   }
 
