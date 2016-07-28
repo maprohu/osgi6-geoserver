@@ -557,6 +557,8 @@ class WS(
     layerName: String,
     title: String
   ): ResourceInfoImpl = {
+    val builder = new CatalogBuilder(catalog)
+
     val resourceInfo = new FeatureTypeInfoImpl(catalog)
     resourceInfo.setName(layerName)
     resourceInfo.setNativeName(storeInfo.getType)
@@ -566,14 +568,20 @@ class WS(
     resourceInfo.setEnabled(true)
     resourceInfo.setProjectionPolicy(ProjectionPolicy.NONE)
     resourceInfo.setSRS("EPSG:4326")
-    resourceInfo.setLatLonBoundingBox(new ReferencedEnvelope(-180, 180, -90, 90, DefaultGeographicCRS.WGS84))
+    resourceInfo.setNativeCRS(DefaultGeographicCRS.WGS84)
+//    resourceInfo.setLatLonBoundingBox(new ReferencedEnvelope(-180, 180, -90, 90, DefaultGeographicCRS.WGS84))
+
+    resourceInfo.setNativeBoundingBox(builder.getNativeBounds(resourceInfo))
+    resourceInfo.setLatLonBoundingBox(resourceInfo.getNativeBoundingBox)
+
     //    resourceInfo.setProjectionPolicy(ProjectionPolicy.REPROJECT_TO_DECLARED)
     //    resourceInfo.setSRS("EPSG:3395")
     //    resourceInfo.setNativeCRS(DefaultGeographicCRS.WGS84)
     //    resourceInfo.setNativeBoundingBox(new ReferencedEnvelope(-180, 180, -85, 85, DefaultGeographicCRS.WGS84))
     //    resourceInfo.setLatLonBoundingBox(resourceInfo.getNativeBoundingBox)//.transform(resourceInfo.getCRS, true))
     //    resourceInfo.setLatLonBoundingBox(new ReferencedEnvelope(-180, 180, -85, 85, DefaultGeographicCRS.WGS84))
-    resourceInfo.setNativeBoundingBox(resourceInfo.getLatLonBoundingBox.transform(resourceInfo.getCRS, true))
+//    resourceInfo.setNativeBoundingBox(resourceInfo.getLatLonBoundingBox.transform(resourceInfo.getCRS, true))
+
     catalog.add(resourceInfo)
 
     resourceInfo
