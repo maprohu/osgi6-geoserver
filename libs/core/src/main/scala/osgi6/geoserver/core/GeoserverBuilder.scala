@@ -8,10 +8,10 @@ import maprohu.scalaext.common.Stateful
 import org.geoserver.catalog.{util => _, _}
 import org.geoserver.catalog.impl._
 import org.geoserver.config.impl.GeoServerImpl
-import org.geoserver.ows.kvp.BooleanKvpParser
+import org.geoserver.ows.kvp.{BooleanKvpParser, FormatOptionsKvpParser}
 import org.geoserver.ows._
 import org.geoserver.platform.{GeoServerExtensions, GeoServerResourceLoader, Service}
-import org.geoserver.wfs.{WFSInfoImpl, WFSLoader, WFSXStreamLoader}
+import org.geoserver.wfs.{DefaultWebFeatureService, WFSInfoImpl, WFSLoader, WFSXStreamLoader}
 import org.geoserver.wfs.kvp.BBoxKvpParser
 import org.geoserver.wms._
 import org.geoserver.wms.capabilities.{CapabilitiesKvpReader, Capabilities_1_3_0_Response, GetCapabilitiesResponse}
@@ -314,9 +314,17 @@ object GeoserverBuilder {
     reg(new PNGLegendOutputFormat)
 
     val htmlFeatureInfoOutputFormat = new HTMLFeatureInfoOutputFormat(wms)
+    val simplejsonFeatureInfoOutputFormat = new SimpleJsonOutputFormat(wms)
+    val geojsonFeatureInfoOutputFormat = new GeoJSONFeatureInfoResponse(wms, "application/json")
+    regNamed("legendOptionsParser", new FormatOptionsKvpParser("legend_options"))
     //    val gml2FeatureInfoOutputFormat = new GML2FeatureInfoOutputFormat(wms)
     //    val gml3FeatureInfoOutputFormat = new GML3FeatureInfoOutputFormat(wms)
 
+    val wfsInfo = new WFSInfoImpl
+    geoserver.add(wfsInfo)
+    val wfsService = new DefaultWebFeatureService(geoserver)
+    val wfs = new Service("wfs", wfsService, new Version("1.0.0"), List())
+    reg(wfs)
 
     wms.setApplicationContext(ctx)
     wmsService.setApplicationContext(ctx)
@@ -337,6 +345,8 @@ object GeoserverBuilder {
     wmsService.setGetFeatureInfo(getFeatureInfo)
     reg(new GetFeatureInfoKvpReader(wms))
     reg(htmlFeatureInfoOutputFormat)
+    reg(geojsonFeatureInfoOutputFormat)
+    reg(simplejsonFeatureInfoOutputFormat)
     //    reg(gml2FeatureInfoOutputFormat)
     //    reg(gml3FeatureInfoOutputFormat)
     val basicLayerIdentifier = new VectorBasicLayerIdentifier(wms)
