@@ -200,8 +200,10 @@ object GeoserverBuilder {
   var input : Input = null
 
   type DA = DataAccess[_ <: org.opengis.feature.`type`.FeatureType, _ <: Feature]
-  type AddFactory = DA => String
+  type DAFactory = () => DA
+  type AddFactory = DAFactory => String
   val ParamName = "GS_FACTORY"
+
 
   lazy val instance : (GS, WS) = {
     val dafClass = classOf[DataAccessFactory]
@@ -210,7 +212,7 @@ object GeoserverBuilder {
 
     case class Factories(
       seq: Int = 0,
-      map: Map[String, DA] = Map()
+      map: Map[String, DAFactory] = Map()
     )
 
     val factories = Stateful(Factories())
@@ -233,7 +235,7 @@ object GeoserverBuilder {
     val dataAccessFactory : DataAccessFactory = new DataAccessFactory{
 
       override def createDataStore(params: util.Map[String, Serializable]): DA = {
-        factories.extract.map(params(ParamName).asInstanceOf[String])
+        factories.extract.map(params(ParamName).asInstanceOf[String]).apply()
       }
 
       override def getDisplayName: String = ""
@@ -553,9 +555,13 @@ class WS(
     storeInfo.setWorkspace(workspaceInfo)
     storeInfo.setType(layerName)
     storeInfo.setEnabled(true)
-    storeInfo.setConnectionParameters(Map[String, Serializable](
-      GeoserverBuilder.ParamName -> dataAccessId
-    ))
+    storeInfo.setConnectionParameters(
+      new java.util.HashMap[String, Serializable](
+        Map[String, Serializable](
+          GeoserverBuilder.ParamName -> dataAccessId
+        )
+      )
+    )
     catalog.add(storeInfo)
 
     storeInfo
@@ -686,5 +692,26 @@ class WS(
     catalog.add(layerGroupInfo)
 
     layerGroupInfo
+  }
+
+  def removeAllLayers = {
+    catalog.getLayers.foreach(l => catalog.remove(l))
+  }
+
+  def removeAllResources = {
+    catalog.getResources(classOf[ResourceInfo]).foreach({ l =>
+      catalog.remove(l)
+      catalog.getResourcePool.clear(l.asInstanceOf[FeatureTypeInfo])
+    })
+  }
+  def removeAllStores = {
+    catalog.getFeatureTypes.foreach({ l =>
+      catalog.remove(l)
+      catalog.getResourcePool.clear(l)
+    })
+    catalog.getDataStores.foreach({ l =>
+      catalog.remove(l)
+      catalog.getResourcePool.clear(l)
+    })
   }
 }
