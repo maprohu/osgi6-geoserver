@@ -35,7 +35,8 @@ object GeoserverActivator {
   ) = {
 
     ActorSystemActivator.activate(
-      bundleContext, { as => import as._
+      bundleContext,
+      { as => import as._
         import actorSystem.dispatcher
 
         ContextApiActivator.activateNonNull(
@@ -64,8 +65,12 @@ object GeoserverActivator {
     apiCtx : Context,
     classLoader : Option[ClassLoader]
   ) : AsyncActivator.Stop = {
+    import sbt.io.Path._
 
-    val workDir = IO.createTemporaryDirectory
+    //    val workDir = IO.createTemporaryDirectory
+    val workDir = apiCtx.data / "../storage" / apiCtx.name / "geoserver_data"
+    IO.delete(workDir)
+    workDir.mkdirs()
 
     val servlet = {
 

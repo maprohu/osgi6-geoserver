@@ -203,7 +203,7 @@ object GeoserverBuilder {
   type AddFactory = DA => String
   val ParamName = "GS_FACTORY"
 
-  lazy val instance = {
+  lazy val instance : (GS, WS) = {
     val dafClass = classOf[DataAccessFactory]
 
 
