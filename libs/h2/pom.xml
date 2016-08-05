@@ -53,7 +53,7 @@
     </dependencies>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <h2-version>1.4.192</h2-version>
+        <h2-version>1.4.191</h2-version>
         <h2-package>com.h2database</h2-package>
         <org.osgi.compendium-version>4.3.1</org.osgi.compendium-version>
         <jts-version>1.13</jts-version>

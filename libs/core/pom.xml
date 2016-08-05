@@ -47,11 +47,11 @@
             <artifactId>akka-persistence-experimental_2.11</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.meetup</groupId>
-            <artifactId>archery_2.11</artifactId>
-            <version>0.4.0</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.meetup</groupId>-->
+            <!--<artifactId>archery_2.11</artifactId>-->
+            <!--<version>0.4.0</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>it.geosolutions.imageio-ext</groupId>
             <artifactId>imageio-ext-png</artifactId>
