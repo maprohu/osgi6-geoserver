@@ -2,9 +2,12 @@ package osgi6.geoserver.core
 
 import java.awt.RenderingHints.Key
 import java.io.{File, Serializable}
+import java.sql.DriverManager
 import java.util
+import javax.servlet.{ServletContext, ServletContextEvent}
 
 import maprohu.scalaext.common.Stateful
+import org.geoserver.GeoserverInitStartupListener
 import org.geoserver.catalog.{util => _, _}
 import org.geoserver.catalog.impl._
 import org.geoserver.config.impl.GeoServerImpl
@@ -24,11 +27,13 @@ import org.geotools.factory.{FactoryIteratorProvider, GeoTools, Hints}
 import org.geotools.geometry.jts.ReferencedEnvelope
 import org.geotools.referencing.crs.DefaultGeographicCRS
 import org.geotools.util.{Converter, ConverterFactory, Version}
+import org.hsqldb.jdbc.JDBCDriver
 import org.opengis.feature
 import org.opengis.feature.Feature
 import org.springframework.context.support.StaticApplicationContext
 import org.springframework.web.context.WebApplicationContext
 import org.springframework.web.context.support.StaticWebApplicationContext
+import osgi6.common.BaseActivator
 import sbt.io.Path._
 
 // 2.5
@@ -194,10 +199,9 @@ object GeoserverBuilder {
 
   case class Input(
     workdir : File,
+    classLoader: ClassLoader,
     defaultWorkspace : String = "defaultws"
   )
-
-  var input : Input = null
 
   type DA = DataAccess[_ <: org.opengis.feature.`type`.FeatureType, _ <: Feature]
   type DAFactory = () => DA
@@ -205,8 +209,9 @@ object GeoserverBuilder {
   val ParamName = "GS_FACTORY"
 
 
-  lazy val instance : (GS, WS) = {
-    val dafClass = classOf[DataAccessFactory]
+  def createInstance(input: Input) : (GS, WS, BaseActivator.Stop) = {
+
+//    val dafClass = classOf[DataAccessFactory]
 
 
 
@@ -232,178 +237,178 @@ object GeoserverBuilder {
       })
     }
 
-    val dataAccessFactory : DataAccessFactory = new DataAccessFactory{
+//    val dataAccessFactory : DataAccessFactory = new DataAccessFactory{
+//
+//      override def createDataStore(params: util.Map[String, Serializable]): DA = {
+//        factories.extract.map(params(ParamName).asInstanceOf[String]).apply()
+//      }
+//
+//      override def getDisplayName: String = ""
+//
+//      override def getDescription: String = ""
+//
+//      override def canProcess(params: util.Map[String, Serializable]): Boolean = true
+//
+//      override def isAvailable: Boolean = true
+//
+//      override def getParametersInfo: Array[Param] = Array()
+//
+//      override def getImplementationHints: util.Map[Key, _] = Map[Key, AnyRef]()
+//
+//    }
 
-      override def createDataStore(params: util.Map[String, Serializable]): DA = {
-        factories.extract.map(params(ParamName).asInstanceOf[String]).apply()
-      }
+//    GeoTools.addFactoryIteratorProvider(new FactoryIteratorProvider {
+//      override def iterator[T](category: Class[T]): util.Iterator[T] = {
+//        category match {
+//          case `dafClass` =>
+//            Iterator.single[T](dataAccessFactory.asInstanceOf[T])
+//          case _ =>
+//            Iterator.empty
+//        }
+//      }
+//    })
 
-      override def getDisplayName: String = ""
+//    System.setProperty("org.geotools.referencing.forceXY", "true")
+//
+//    val ctx = new StaticApplicationContext()
+//    def regNamed(name:String, bean:Any):Unit = {
+//      ctx.getBeanFactory.registerSingleton(name, bean)
+//    }
+//    def reg(bean:Any):Unit = {
+//      regNamed(bean.getClass.getCanonicalName, bean)
+//    }
 
-      override def getDescription: String = ""
-
-      override def canProcess(params: util.Map[String, Serializable]): Boolean = true
-
-      override def isAvailable: Boolean = true
-
-      override def getParametersInfo: Array[Param] = Array()
-
-      override def getImplementationHints: util.Map[Key, _] = Map[Key, AnyRef]()
-
-    }
-
-    GeoTools.addFactoryIteratorProvider(new FactoryIteratorProvider {
-      override def iterator[T](category: Class[T]): util.Iterator[T] = {
-        category match {
-          case `dafClass` =>
-            Iterator.single[T](dataAccessFactory.asInstanceOf[T])
-          case _ =>
-            Iterator.empty
-        }
-      }
-    })
-
-    System.setProperty("org.geotools.referencing.forceXY", "true")
-
-    val ctx = new StaticApplicationContext()
-    def regNamed(name:String, bean:Any):Unit = {
-      ctx.getBeanFactory.registerSingleton(name, bean)
-    }
-    def reg(bean:Any):Unit = {
-      regNamed(bean.getClass.getCanonicalName, bean)
-    }
-
-    new GeoServerExtensions().setApplicationContext(ctx)
-
-    val geoserver = new GeoServerImpl
-    val wmsInfo = new WMSInfoImpl()
-    geoserver.add(wmsInfo)
+//    new GeoServerExtensions().setApplicationContext(ctx)
+//
+//    val geoserver = new GeoServerImpl
+//    val wmsInfo = new WMSInfoImpl()
+//    geoserver.add(wmsInfo)
 
 
     val catalog = new LocalWorkspaceCatalog(new CatalogImpl)
-    regNamed("catalog", catalog)
-    geoserver.setCatalog(catalog)
-    val gsrl = new GeoServerResourceLoader(input.workdir)
-    reg(gsrl)
-    // 2.5
-    GeoserverDataDirectory.setResourceLoader(gsrl)
-    catalog.setResourceLoader(gsrl)
-
-    //  val wfsLoader = new WFSXStreamLoader(gsrl)
-    //  val wfsInfo = wfsLoader.create(geoserver)
-    //  geoserver.add(wfsInfo)
-
-
-
-
-    val wms = new WMS(geoserver)
-
-    val wmsService = new DefaultWebMapService(wms)
-
-
-    val getCapabilities = new GetCapabilities(wms)
-    wmsService.setGetCapabilities(getCapabilities)
-
-    reg(new CapabilitiesKvpReader(wms))
-
-    // 2.8.2
-    //        reg(new DimensionDefaultValueSelectionStrategyFactoryImpl)
-    reg(new Capabilities_1_3_0_Response)
-    reg(new GetCapabilitiesResponse(wms))
-    reg(new BBoxKvpParser)
-    reg(new BooleanKvpParser("transparent"))
-    //    reg(new LegendSampleImpl(catalog, gsrl))
-    reg(new PNGLegendOutputFormat)
-
-    val htmlFeatureInfoOutputFormat = new HTMLFeatureInfoOutputFormat(wms)
-    val simplejsonFeatureInfoOutputFormat = new SimpleJsonOutputFormat(wms)
-    val geojsonFeatureInfoOutputFormat = new GeoJSONFeatureInfoResponse(wms, "application/json")
-    regNamed("legendOptionsParser", new FormatOptionsKvpParser("legend_options"))
-    //    val gml2FeatureInfoOutputFormat = new GML2FeatureInfoOutputFormat(wms)
-    //    val gml3FeatureInfoOutputFormat = new GML3FeatureInfoOutputFormat(wms)
-
-    val wfsInfo = new WFSInfoImpl
-    geoserver.add(wfsInfo)
-    val wfsService = new DefaultWebFeatureService(geoserver)
-    val wfs = new Service("wfs", wfsService, new Version("1.0.0"), List())
-    reg(wfs)
-
-    wms.setApplicationContext(ctx)
-    wmsService.setApplicationContext(ctx)
-    reg(new RenderedImageMapOutputFormat(wms))
-    //    reg(new OpenLayersMapOutputFormat(wms))
-    reg(new PNGMapResponse(wms))
-    reg(new RawMapResponse)
-    reg(new GetFeatureInfoResponse(wms, htmlFeatureInfoOutputFormat))
-
-
-
-    val getMap = new GetMap(wms)
-    wmsService.setGetMap(getMap)
-    reg(new GetMapKvpRequestReader(wms))
-
-
-    val getFeatureInfo = new GetFeatureInfo
-    wmsService.setGetFeatureInfo(getFeatureInfo)
-    reg(new GetFeatureInfoKvpReader(wms))
-    reg(htmlFeatureInfoOutputFormat)
-    reg(geojsonFeatureInfoOutputFormat)
-    reg(simplejsonFeatureInfoOutputFormat)
-    //    reg(gml2FeatureInfoOutputFormat)
-    //    reg(gml3FeatureInfoOutputFormat)
-    val basicLayerIdentifier = new VectorBasicLayerIdentifier(wms)
-    reg(new VectorRenderingLayerIdentifier(wms, basicLayerIdentifier))
-    reg(new RasterCleaner)
-
-    val getLegendGraphic = new GetLegendGraphic(wms)
-    wmsService.setGetLegendGraphic(getLegendGraphic)
-    reg(new GetLegendGraphicKvpReader(wms))
-    reg(new PNGLegendGraphicResponse)
-    reg(new LocalWorkspaceCallback(geoserver))
-    reg(new LocalWorkspaceCatalogFilter(catalog))
-    regNamed("umows", new LocalWorkspaceURLMangler("ows"))
-    regNamed("umwms", new LocalWorkspaceURLMangler("wms"))
-    reg(new WMSWorkspaceQualifier(catalog))
-
-    val wms130sd = new Service("wms", wmsService, new Version("1.3.0"), List(
-      "GetCapabilities",
-      "GetMap",
-      "GetFeatureInfo",
-      "GetLegendGraphic"
-    ))
-    regNamed("wms130", wms130sd)
-
-    val wms111sd = new Service("wms", wmsService, new Version("1.1.1"), List(
-      "GetCapabilities",
-      "GetMap",
-      "GetFeatureInfo",
-      "GetLegendGraphic"
-    ))
-    regNamed("wms111", wms111sd)
-
-    // 2.8.2
-    //        reg(new SLDHandler)
-
-    wms.setApplicationContext(ctx)
-
-    val dispatcher = new Dispatcher
+//    regNamed("catalog", catalog)
+//    geoserver.setCatalog(catalog)
+//    val gsrl = new GeoServerResourceLoader(input.workdir)
+//    reg(gsrl)
+//    // 2.5
+//    GeoserverDataDirectory.setResourceLoader(gsrl)
+//    catalog.setResourceLoader(gsrl)
+//
+//    //  val wfsLoader = new WFSXStreamLoader(gsrl)
+//    //  val wfsInfo = wfsLoader.create(geoserver)
+//    //  geoserver.add(wfsInfo)
+//
+//
+//
+//
+//    val wms = new WMS(geoserver)
+//
+//    val wmsService = new DefaultWebMapService(wms)
+//
+//
+//    val getCapabilities = new GetCapabilities(wms)
+//    wmsService.setGetCapabilities(getCapabilities)
+//
+//    reg(new CapabilitiesKvpReader(wms))
+//
+//    // 2.8.2
+//    //        reg(new DimensionDefaultValueSelectionStrategyFactoryImpl)
+//    reg(new Capabilities_1_3_0_Response)
+//    reg(new GetCapabilitiesResponse(wms))
+//    reg(new BBoxKvpParser)
+//    reg(new BooleanKvpParser("transparent"))
+//    //    reg(new LegendSampleImpl(catalog, gsrl))
+//    reg(new PNGLegendOutputFormat)
+//
+//    val htmlFeatureInfoOutputFormat = new HTMLFeatureInfoOutputFormat(wms)
+//    val simplejsonFeatureInfoOutputFormat = new SimpleJsonOutputFormat(wms)
+//    val geojsonFeatureInfoOutputFormat = new GeoJSONFeatureInfoResponse(wms, "application/json")
+//    regNamed("legendOptionsParser", new FormatOptionsKvpParser("legend_options"))
+//    //    val gml2FeatureInfoOutputFormat = new GML2FeatureInfoOutputFormat(wms)
+//    //    val gml3FeatureInfoOutputFormat = new GML3FeatureInfoOutputFormat(wms)
+//
+//    val wfsInfo = new WFSInfoImpl
+//    geoserver.add(wfsInfo)
+//    val wfsService = new DefaultWebFeatureService(geoserver)
+//    val wfs = new Service("wfs", wfsService, new Version("1.0.0"), List())
+//    reg(wfs)
+//
+//    wms.setApplicationContext(ctx)
+//    wmsService.setApplicationContext(ctx)
+//    reg(new RenderedImageMapOutputFormat(wms))
+//    //    reg(new OpenLayersMapOutputFormat(wms))
+//    reg(new PNGMapResponse(wms))
+//    reg(new RawMapResponse)
+//    reg(new GetFeatureInfoResponse(wms, htmlFeatureInfoOutputFormat))
+//
+//
+//
+//    val getMap = new GetMap(wms)
+//    wmsService.setGetMap(getMap)
+//    reg(new GetMapKvpRequestReader(wms))
+//
+//
+//    val getFeatureInfo = new GetFeatureInfo
+//    wmsService.setGetFeatureInfo(getFeatureInfo)
+//    reg(new GetFeatureInfoKvpReader(wms))
+//    reg(htmlFeatureInfoOutputFormat)
+//    reg(geojsonFeatureInfoOutputFormat)
+//    reg(simplejsonFeatureInfoOutputFormat)
+//    //    reg(gml2FeatureInfoOutputFormat)
+//    //    reg(gml3FeatureInfoOutputFormat)
+//    val basicLayerIdentifier = new VectorBasicLayerIdentifier(wms)
+//    reg(new VectorRenderingLayerIdentifier(wms, basicLayerIdentifier))
+//    reg(new RasterCleaner)
+//
+//    val getLegendGraphic = new GetLegendGraphic(wms)
+//    wmsService.setGetLegendGraphic(getLegendGraphic)
+//    reg(new GetLegendGraphicKvpReader(wms))
+//    reg(new PNGLegendGraphicResponse)
+//    reg(new LocalWorkspaceCallback(geoserver))
+//    reg(new LocalWorkspaceCatalogFilter(catalog))
+//    regNamed("umows", new LocalWorkspaceURLMangler("ows"))
+//    regNamed("umwms", new LocalWorkspaceURLMangler("wms"))
+//    reg(new WMSWorkspaceQualifier(catalog))
+//
+//    val wms130sd = new Service("wms", wmsService, new Version("1.3.0"), List(
+//      "GetCapabilities",
+//      "GetMap",
+//      "GetFeatureInfo",
+//      "GetLegendGraphic"
+//    ))
+//    regNamed("wms130", wms130sd)
+//
+//    val wms111sd = new Service("wms", wmsService, new Version("1.1.1"), List(
+//      "GetCapabilities",
+//      "GetMap",
+//      "GetFeatureInfo",
+//      "GetLegendGraphic"
+//    ))
+//    regNamed("wms111", wms111sd)
+//
+//    // 2.8.2
+//    //        reg(new SLDHandler)
+//
+//    wms.setApplicationContext(ctx)
+//
+//    val dispatcher = new Dispatcher
 
     val wac = new StaticWebApplicationContext
 
-    val mapping = new OWSHandlerMapping(catalog)
-    mapping.setAlwaysUseFullPath(true)
-    mapping.setUrlMap(Map(
-      "/ows" -> dispatcher,
-      "/ows/*" -> dispatcher,
-      "/wms" -> dispatcher,
-      "/wms/*" -> dispatcher
-    ))
-
-
-
-    wac.getBeanFactory.registerSingleton("mapping", mapping)
-    mapping.setApplicationContext(wac)
-    dispatcher.setApplicationContext(ctx)
+//    val mapping = new OWSHandlerMapping(catalog)
+//    mapping.setAlwaysUseFullPath(true)
+//    mapping.setUrlMap(Map(
+//      "/ows" -> dispatcher,
+//      "/ows/*" -> dispatcher,
+//      "/wms" -> dispatcher,
+//      "/wms/*" -> dispatcher
+//    ))
+//
+//
+//
+//    wac.getBeanFactory.registerSingleton("mapping", mapping)
+//    mapping.setApplicationContext(wac)
+//    dispatcher.setApplicationContext(ctx)
 
     val gs = new GS(
       wac,
@@ -413,9 +418,19 @@ object GeoserverBuilder {
     )
 
 
+    val stop = { () =>
+      GeoserverShutdown.contextDestroyed(input.classLoader)
+      DriverManager.getDrivers.foreach({
+        case d : (JDBCDriver)=>
+          DriverManager.deregisterDriver(d)
+        case _ =>
+      })
+
+    }
+
     val ws = gs.createWS(input.defaultWorkspace,true)
 
-    (gs, ws)
+    (gs, ws, stop)
 
   }
 
@@ -493,6 +508,7 @@ class GS(
   val catalog: Catalog,
   val workdir: File,
   val addFactory : GeoserverBuilder.AddFactory
+//  val stop : () => Unit
 ) {
   def createWS(name: String, default : Boolean = false) : WS = {
     val workspaceInfo = new WorkspaceInfoImpl
@@ -511,6 +527,8 @@ class GS(
       namespaceInfo
     )
   }
+
+
 
 }
 
