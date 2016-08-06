@@ -280,6 +280,10 @@ public class H2GISDialect extends BasicSQLDialect {
             dataStore.closeSafe(statement);
         }
 
+        if (srid == 0) {
+            srid = 4326;
+        }
+
         return srid;
     }
     

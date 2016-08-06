@@ -3,6 +3,8 @@ package osgi6.geoserver.geotools
 import java.awt.Rectangle
 import java.awt.image.BufferedImage
 import java.io.File
+import java.util
+import javax.imageio.ImageIO
 import javax.sql.DataSource
 
 import org.geotools.geometry.jts.ReferencedEnvelope
@@ -12,6 +14,7 @@ import org.geotools.renderer.lite.StreamingRenderer
 import org.geotools.styling.BasicPolygonStyle
 import org.orbisgis.geoserver.h2gis.datastore.H2GISEmbeddedDataStoreFactory
 import osgi6.h2gis.impl.H2GisActivator
+
 import scala.collection.JavaConversions._
 
 /**
@@ -22,7 +25,7 @@ object RunGtRender {
   case class Input(
     imageWidth : Int = 1024,
     imageHeight : Int = 768,
-    mapArea : ReferencedEnvelope = new ReferencedEnvelope(0, 90, 0, 80, DefaultGeographicCRS.WGS84)
+    mapArea : ReferencedEnvelope = new ReferencedEnvelope(0, 45, 0, 80, DefaultGeographicCRS.WGS84)
   )
 
   def main(args: Array[String]) {
@@ -46,9 +49,13 @@ object RunGtRender {
 
     val iceStyle = new BasicPolygonStyle()
 
-    val store = dsf.createDataStore(Map[String, Serializable]())
+    val store = dsf.createDataStore(
+      new util.HashMap[String, Serializable](
+        Map[String, Serializable]()
+      )
+    )
 
-    val layer = new FeatureLayer(store.getFeatureSource(""), iceStyle)
+    val layer = new FeatureLayer(store.getFeatureSource("ICE_20150217"), iceStyle)
     mapContent.addLayer(layer)
 
     val render = new StreamingRenderer
@@ -68,8 +75,9 @@ object RunGtRender {
       graphics2D,
       paintArea,
       mapArea
-
     )
+
+    ImageIO.write(image, "png", new File("../osgi6-geoserver/target/render.png"))
 
 
 

@@ -25,6 +25,9 @@
         </plugins>
     </build>
 
+    <properties>
+        <gt.version>11.5</gt.version>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -74,12 +77,17 @@
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-render</artifactId>
-            <version>11.5</version>
+            <version>${gt.version}</version>
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-jdbc</artifactId>
-            <version>11.5</version>
+            <version>${gt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-epsg-wkt</artifactId>
+            <version>${gt.version}</version>
         </dependency>
         <dependency>
             <groupId>osgi6</groupId>
@@ -92,6 +100,21 @@
             <artifactId>osgi6-geoserver-h2</artifactId>
             <version>1.0.0-SNAPSHOT</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>osgi6</groupId>
+            <artifactId>osgi6-akka-http-multi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lihaoyi</groupId>
+            <artifactId>scalatags_2.11</artifactId>
+            <version>0.6.0</version>
         </dependency>
 
     </dependencies>
