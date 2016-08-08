@@ -7,6 +7,7 @@ import java.util
 import javax.imageio.ImageIO
 import javax.sql.DataSource
 
+import ogsi6.libs.h2gis.H2GisUtil
 import org.geotools.geometry.jts.ReferencedEnvelope
 import org.geotools.map.{FeatureLayer, MapContent}
 import org.geotools.referencing.crs.{DefaultGeocentricCRS, DefaultGeographicCRS}
@@ -30,7 +31,7 @@ object RunGtRender {
 
   def main(args: Array[String]) {
 
-    val dataSource = H2GisActivator.createDataSource(
+    val (ds, dsClose) = H2GisUtil.createDataSource(
       new File(
         "../wupdata-osgi/target/bshh2gisstore/h2gis"
       )
@@ -38,7 +39,7 @@ object RunGtRender {
 
     val dsf =
       new H2GISEmbeddedDataStoreFactory {
-        override protected def createH2GisDataSource(): DataSource = dataSource.dataSource()
+        override protected def createH2GisDataSource(): DataSource = ds
       }
 
     val input = Input()

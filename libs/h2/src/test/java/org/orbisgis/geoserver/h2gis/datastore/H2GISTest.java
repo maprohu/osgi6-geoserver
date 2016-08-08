@@ -271,21 +271,21 @@ public class H2GISTest extends H2GISDBTestSetUp {
         st.execute("drop table LANDCOVER");       
     }
     
-    @Test
-    public void testNoCRS() throws Exception {
-        st.execute("drop table if exists LANDCOVER");
-        st.execute("CREATE TABLE LANDCOVER ( FID INTEGER, NAME CHARACTER VARYING(64),"
-                + " THE_GEOM POLYGON);"
-                + "INSERT INTO LANDCOVER VALUES(1, 'Green Forest', 'POLYGON((110 330, 210 330, 210 240, 110 240, 110 330))');"
-                + "INSERT INTO LANDCOVER VALUES(2, 'Cereal', 'POLYGON((200 220, 310 220, 310 160, 200 160, 200 220))');"
-                + "INSERT INTO LANDCOVER VALUES(3, 'Building', 'POLYGON((90 130, 140 130, 140 110, 90 110, 90 130))');");
-
-        SimpleFeatureSource fs = (SimpleFeatureSource) ds.getFeatureSource("LANDCOVER");
-        SimpleFeatureCollection features = fs.getFeatures(Filter.INCLUDE);
-        CoordinateReferenceSystem crs = features.getBounds().getCoordinateReferenceSystem();
-        assertNull(crs);
-        st.execute("drop table LANDCOVER");
-    }
+//    @Test
+//    public void testNoCRS() throws Exception {
+//        st.execute("drop table if exists LANDCOVER");
+//        st.execute("CREATE TABLE LANDCOVER ( FID INTEGER, NAME CHARACTER VARYING(64),"
+//                + " THE_GEOM POLYGON);"
+//                + "INSERT INTO LANDCOVER VALUES(1, 'Green Forest', 'POLYGON((110 330, 210 330, 210 240, 110 240, 110 330))');"
+//                + "INSERT INTO LANDCOVER VALUES(2, 'Cereal', 'POLYGON((200 220, 310 220, 310 160, 200 160, 200 220))');"
+//                + "INSERT INTO LANDCOVER VALUES(3, 'Building', 'POLYGON((90 130, 140 130, 140 110, 90 110, 90 130))');");
+//
+//        SimpleFeatureSource fs = (SimpleFeatureSource) ds.getFeatureSource("LANDCOVER");
+//        SimpleFeatureCollection features = fs.getFeatures(Filter.INCLUDE);
+//        CoordinateReferenceSystem crs = features.getBounds().getCoordinateReferenceSystem();
+//        assertNull(crs);
+//        st.execute("drop table LANDCOVER");
+//    }
 
     @Test
     public void testWithCRS() throws Exception {

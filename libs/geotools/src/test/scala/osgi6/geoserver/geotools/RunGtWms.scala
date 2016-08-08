@@ -9,12 +9,14 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, MediaTypes}
 import akka.http.scaladsl.server.Directives
 import akka.stream.ActorMaterializer
+import ogsi6.libs.h2gis.H2GisUtil
 import org.geotools.map.FeatureLayer
 import org.geotools.styling.BasicPolygonStyle
 import org.orbisgis.geoserver.h2gis.datastore.H2GISEmbeddedDataStoreFactory
 import osgi6.actor.ActorSystemActivator
 import osgi6.geoserver.geotools.AkkaWMS.LayersProvider
 import osgi6.h2gis.impl.H2GisActivator
+
 import scala.collection.JavaConversions._
 
 /**
@@ -30,7 +32,7 @@ object RunGtWms {
 
     import Directives._
 
-    val dataSource = H2GisActivator.createDataSource(
+    val (dataSource, dsClose) = H2GisUtil.createDataSource(
       new File(
         "../wupdata-osgi/target/bshh2gisstore/h2gis"
       )
@@ -38,7 +40,7 @@ object RunGtWms {
 
     val dsf =
       new H2GISEmbeddedDataStoreFactory {
-        override protected def createH2GisDataSource(): DataSource = dataSource.dataSource()
+        override protected def createH2GisDataSource(): DataSource = dataSource
       }
 
     val store = dsf.createDataStore(
