@@ -64,6 +64,7 @@ import org.h2gis.utilities.SFSUtilities;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * Dialect to transform from to geotools feature model 
@@ -286,7 +287,23 @@ public class H2GISDialect extends BasicSQLDialect {
 
         return srid;
     }
-    
+
+    @Override
+    public CoordinateReferenceSystem createCRS(int srid, Connection cx) throws SQLException {
+        if (srid == 4326) {
+            try {
+                return CRS.decode("EPSG:4326", true);
+            } catch(Exception e) {
+                if(LOGGER.isLoggable(Level.FINE)) {
+                    LOGGER.log(Level.FINE, "Could not decode " + srid + " using the built-in EPSG database");
+                }
+                return null;
+            }
+        } else {
+            return super.createCRS(srid, cx);
+        }
+    }
+
     @Override
     public int getGeometryDimension(String schemaName, String tableName, String columnName,
             Connection cx) throws SQLException {

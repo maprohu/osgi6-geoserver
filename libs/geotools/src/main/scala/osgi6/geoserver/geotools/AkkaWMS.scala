@@ -119,6 +119,8 @@ object AkkaWMS {
                   PartialFunction(layers)
                 ).get
 
+                import GeotoolsMapService._
+
                 render(
                   Input(
                     imageWidth = width,
@@ -162,43 +164,6 @@ object AkkaWMS {
 
 
 
-  case class Input(
-    imageWidth : Int = 1024,
-    imageHeight : Int = 768,
-    mapArea : ReferencedEnvelope = new ReferencedEnvelope(0, 90, 0, 80, DefaultGeographicCRS.WGS84),
-    layers: Iterable[Layer]
-  )
 
-  def render(input: Input) : Array[Byte] = {
-    import scala.collection.JavaConversions._
-
-    import input._
-
-    val mapContent = new MapContent()
-
-    mapContent.addLayers(layers)
-
-    val render = new StreamingRenderer
-    render.setMapContent(mapContent)
-
-    val image = new BufferedImage(
-      imageWidth,
-      imageHeight,
-      BufferedImage.TYPE_INT_ARGB
-    )
-
-    val graphics2D = image.createGraphics()
-    val paintArea = new Rectangle(imageWidth, imageHeight)
-
-    render.paint(
-      graphics2D,
-      paintArea,
-      mapArea
-    )
-
-    val bos = new ByteArrayOutputStream()
-    ImageIO.write(image, "png", bos)
-    bos.toByteArray
-  }
 
 }

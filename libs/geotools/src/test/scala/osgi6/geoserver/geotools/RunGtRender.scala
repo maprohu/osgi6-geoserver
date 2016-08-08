@@ -50,9 +50,7 @@ object RunGtRender {
     val iceStyle = new BasicPolygonStyle()
 
     val store = dsf.createDataStore(
-      new util.HashMap[String, Serializable](
-        Map[String, Serializable]()
-      )
+      new util.HashMap[String, Serializable]()
     )
 
     val layer = new FeatureLayer(store.getFeatureSource("ICE_20150217"), iceStyle)
