@@ -10,20 +10,20 @@
     <artifactId>osgi6-geoserver-geotools</artifactId>
     <packaging>jar</packaging>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-                        <Embed-Transitive>true</Embed-Transitive>
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <!--<build>-->
+        <!--<plugins>-->
+            <!--<plugin>-->
+                <!--<groupId>org.apache.felix</groupId>-->
+                <!--<artifactId>maven-bundle-plugin</artifactId>-->
+                <!--<configuration>-->
+                    <!--<instructions>-->
+                        <!--<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>-->
+                        <!--<Embed-Transitive>true</Embed-Transitive>-->
+                    <!--</instructions>-->
+                <!--</configuration>-->
+            <!--</plugin>-->
+        <!--</plugins>-->
+    <!--</build>-->
 
     <properties>
         <gt.version>11.5</gt.version>
@@ -84,11 +84,11 @@
             <artifactId>gt-jdbc</artifactId>
             <version>${gt.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-epsg-hsql</artifactId>
-            <version>${gt.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.geotools</groupId>-->
+            <!--<artifactId>gt-epsg-hsql</artifactId>-->
+            <!--<version>${gt.version}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-epsg-wkt</artifactId>

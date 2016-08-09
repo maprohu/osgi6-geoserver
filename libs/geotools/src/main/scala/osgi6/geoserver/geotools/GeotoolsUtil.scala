@@ -1,6 +1,9 @@
 package osgi6.geoserver.geotools
 
+import java.util.ResourceBundle
+
 import org.geotools.referencing.factory.DeferredAuthorityFactory
+import org.geotools.renderer.i18n.Vocabulary
 import org.geotools.util.WeakCollectionCleaner
 
 /**
@@ -11,6 +14,7 @@ object GeotoolsUtil {
   def shutdown() = {
     WeakCollectionCleaner.DEFAULT.exit()
     DeferredAuthorityFactory.exit()
+    ResourceBundle.clearCache(classOf[Vocabulary].getClassLoader)
   }
 
 }
