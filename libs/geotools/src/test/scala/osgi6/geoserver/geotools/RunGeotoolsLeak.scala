@@ -1,5 +1,8 @@
 package osgi6.geoserver.geotools
 
+import java.util.logging.Logger
+
+import org.geotools.coverage.processing.CoverageProcessor
 import org.geotools.referencing.factory.DeferredAuthorityFactory
 
 /**
@@ -9,10 +12,9 @@ object RunGeotoolsLeak {
 
   def main(args: Array[String]) {
 
-    DeferredAuthorityFactory.exit()
+    Logger.getLogger("boo").log(CoverageProcessor.OPERATION, "hehe")
 
-
-
+    GeotoolsUtil.shutdown()
 
   }
 
