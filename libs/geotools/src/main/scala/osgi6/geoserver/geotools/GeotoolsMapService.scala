@@ -1,6 +1,6 @@
 package osgi6.geoserver.geotools
 
-import java.awt.Rectangle
+import java.awt.{Rectangle, RenderingHints}
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
@@ -32,6 +32,7 @@ object GeotoolsMapService {
       mapContent.addLayers(layers)
 
       val render = new StreamingRenderer
+
       render.setMapContent(mapContent)
 
       val image = new BufferedImage(
@@ -41,6 +42,10 @@ object GeotoolsMapService {
       )
 
       val graphics2D = image.createGraphics()
+      graphics2D.setRenderingHint(
+        RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON
+      )
+
       val paintArea = new Rectangle(imageWidth, imageHeight)
 
       render.paint(
