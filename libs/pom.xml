@@ -11,7 +11,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>core</module>
+        <!--<module>core</module>-->
         <module>h2</module>
         <module>geotools</module>
     </modules>
