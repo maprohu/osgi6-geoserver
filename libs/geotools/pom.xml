@@ -97,7 +97,6 @@
         <dependency>
             <groupId>osgi6</groupId>
             <artifactId>osgi6-h2gis</artifactId>
-            <version>1.0.9-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
         <dependency>

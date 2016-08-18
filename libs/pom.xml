@@ -12,7 +12,7 @@
 
     <modules>
         <!--<module>core</module>-->
-        <module>h2</module>
         <module>geotools</module>
+        <module>h2</module>
     </modules>
 </project>

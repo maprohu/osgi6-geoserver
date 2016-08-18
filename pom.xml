@@ -254,6 +254,11 @@
             </dependency>
             <dependency>
                 <groupId>osgi6</groupId>
+                <artifactId>osgi6-h2gis</artifactId>
+                <version>${osgi6.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>osgi6</groupId>
                 <artifactId>osgi6-akka-http-multi</artifactId>
                 <version>${osgi6.version}</version>
             </dependency>
