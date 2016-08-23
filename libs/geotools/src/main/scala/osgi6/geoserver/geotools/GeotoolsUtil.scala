@@ -2,17 +2,22 @@ package osgi6.geoserver.geotools
 
 import java.util
 import java.util.ResourceBundle
-import java.util.logging.Level
+import java.util.logging.{Level, LogManager}
 
 import org.geotools.coverage.processing.CoverageProcessor
 import org.geotools.referencing.factory.DeferredAuthorityFactory
 import org.geotools.renderer.i18n.Vocabulary
 import org.geotools.util.WeakCollectionCleaner
+import org.geotools.util.logging.Logging
 
 /**
   * Created by pappmar on 08/08/2016.
   */
 object GeotoolsUtil {
+
+  def init() = {
+    Logging.getLogger("org.geotools").setLevel(Level.OFF)
+  }
 
   def shutdown() = {
     WeakCollectionCleaner.DEFAULT.exit()
