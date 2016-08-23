@@ -11,32 +11,9 @@
         <akka.version>2.3.15</akka.version>
         <akka-stream.version>2.0.4</akka-stream.version>
         <scala-ext.version>1.0.3</scala-ext.version>
-        <osgi6.version>1.0.10-SNAPSHOT</osgi6.version>
     </properties>
 
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>maven-bundle-plugin</artifactId>
-                    <version>3.0.1</version>
-                    <configuration>
-                        <finalName>osgi</finalName>
-                        <classifier>bundle</classifier>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>bundle</id>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>bundle</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
@@ -91,25 +68,6 @@
                 </configuration>
             </plugin>
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.6</version>
-                <executions>
-                    <execution>
-                        <id>project</id>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <phase>package</phase>
-                        <inherited>false</inherited>
-                        <configuration>
-                            <descriptorRefs>
-                                <descriptorRef>project</descriptorRef>
-                            </descriptorRefs>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.10.4</version>
@@ -140,61 +98,6 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.json4s</groupId>
-                <artifactId>json4s-native_2.11</artifactId>
-                <version>3.4.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>1.7.21</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>servlet-api</artifactId>
-                <version>2.5</version>
-            </dependency>
-            <dependency>
-                <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-stream-experimental_2.11</artifactId>
-                <version>${akka-stream.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-http-experimental_2.11</artifactId>
-                <version>${akka-stream.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-actor_2.11</artifactId>
-                <version>${akka.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-remote_2.11</artifactId>
-                <version>${akka.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-cluster_2.11</artifactId>
-                <version>${akka.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-contrib_2.11</artifactId>
-                <version>${akka.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-slf4j_2.11</artifactId>
-                <version>${akka.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.typesafe.akka</groupId>
-                <artifactId>akka-persistence-experimental_2.11</artifactId>
-                <version>${akka.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>maprohu</groupId>
                 <artifactId>scala-ext-common</artifactId>
                 <version>${scala-ext.version}</version>
@@ -215,72 +118,10 @@
                 <version>2.11.8</version>
             </dependency>
 
-
-            <dependency>
-                <groupId>maprohu</groupId>
-                <artifactId>scala-ext-common</artifactId>
-                <version>${scala-ext.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>osgi6</groupId>
-                <artifactId>osgi6-akka-slf4j</artifactId>
-                <version>${osgi6.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>osgi6</groupId>
-                <artifactId>osgi6-testing</artifactId>
-                <version>${osgi6.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>osgi6</groupId>
-                <artifactId>osgi6-runtime</artifactId>
-                <version>${osgi6.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>osgi6</groupId>
-                <artifactId>osgi6-akka-stream</artifactId>
-                <version>${osgi6.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>osgi6</groupId>
-                <artifactId>osgi6-actor</artifactId>
-                <version>${osgi6.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>osgi6</groupId>
-                <artifactId>osgi6-scalarx</artifactId>
-                <version>${osgi6.version}</version>
-            </dependency>
             <dependency>
                 <groupId>osgi6</groupId>
                 <artifactId>osgi6-h2gis</artifactId>
-                <version>${osgi6.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>osgi6</groupId>
-                <artifactId>osgi6-akka-http-multi</artifactId>
-                <version>${osgi6.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>osgi6</groupId>
-                <artifactId>osgi6-akka-http-strict</artifactId>
-                <version>${osgi6.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>osgi6</groupId>
-                <artifactId>osgi6-strict-api</artifactId>
-                <version>${osgi6.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>osgi6</groupId>
-                <artifactId>osgi6-multi-api</artifactId>
-                <version>${osgi6.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>osgi6</groupId>
-                <artifactId>osgi6-lib-multi</artifactId>
-                <version>${osgi6.version}</version>
+                <version>1.0.10</version>
             </dependency>
 
         </dependencies>
