@@ -15,6 +15,8 @@ import org.geotools.renderer.lite.StreamingRenderer
   */
 object GeotoolsMapService {
 
+  System.setProperty("java.awt.headless", "true")
+
   case class Input(
     imageWidth : Int = 1024,
     imageHeight : Int = 768,
@@ -42,21 +44,25 @@ object GeotoolsMapService {
       )
 
       val graphics2D = image.createGraphics()
-      graphics2D.setRenderingHint(
-        RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON
-      )
+      try {
+        graphics2D.setRenderingHint(
+          RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON
+        )
 
-      val paintArea = new Rectangle(imageWidth, imageHeight)
+        val paintArea = new Rectangle(imageWidth, imageHeight)
 
-      render.paint(
-        graphics2D,
-        paintArea,
-        mapArea
-      )
+        render.paint(
+          graphics2D,
+          paintArea,
+          mapArea
+        )
 
-      val bos = new ByteArrayOutputStream()
-      ImageIO.write(image, "png", bos)
-      bos.toByteArray
+        val bos = new ByteArrayOutputStream()
+        ImageIO.write(image, "png", bos)
+        bos.toByteArray
+      } finally {
+        graphics2D.dispose()
+      }
     } finally {
       mapContent.dispose()
     }
