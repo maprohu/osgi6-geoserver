@@ -62,7 +62,13 @@ object GeotoolsMapService {
         BufferedImage.TYPE_INT_ARGB
       )
 
-      val graphics2D = graphicsEnvironment.createGraphics(image)
+      val graphics2D = try {
+        graphicsEnvironment.createGraphics(image)
+      } catch {
+        case e : Throwable =>
+          throw new RuntimeException(e)
+      }
+
       try {
         graphics2D.setRenderingHint(
           RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON
