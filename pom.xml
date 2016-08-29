@@ -4,7 +4,7 @@
 
     <groupId>osgi6-geoserver</groupId>
     <artifactId>osgi6-geoserver</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -170,7 +170,7 @@
 
     <scm>
         <developerConnection>scm:git:https://github.com/maprohu/osgi6-geoserver.git</developerConnection>
-        <tag>osgi6-geoserver-1.0.2</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <modules>
