@@ -5,7 +5,7 @@
     <parent>
         <groupId>osgi6-geoserver</groupId>
         <artifactId>osgi6-geoserver</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.0.2</version>
     </parent>
     <artifactId>osgi6-geoserver-libs</artifactId>
     <packaging>pom</packaging>
