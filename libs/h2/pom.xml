@@ -44,7 +44,11 @@
             <groupId>org.geotools</groupId>
             <artifactId>gt-referencing</artifactId>
             <version>${geotools-version}</version>
-            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-metadata</artifactId>
+            <version>${geotools-version}</version>
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
@@ -56,7 +60,6 @@
             <groupId>org.geotools</groupId>
             <artifactId>gt-jdbc</artifactId>
             <version>${geotools-version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.orbisgis</groupId>
